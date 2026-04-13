@@ -84,17 +84,44 @@ const options = commander.program.opts();
     //    '-c:v', 'libvpx-vp9', '-pix_fmt', 'yuva420p', '-auto-alt-ref', '0', options.output
     //]);
 
-    const ffmpeg = child_process.spawn('ffmpeg', [
-        '-y', 
-        '-f', 'image2pipe', 
-        '-vcodec', 'png', 
-        '-r', fps.toString(), 
-        '-i', '-',
-        // Use QTRLE (QuickTime Animation) which supports Alpha natively
-        '-c:v', 'qtrle', 
-        '-pix_fmt', 'argb',
-        options.output.replace('.webm', '.mov') // Change output to .mov
-    ]);
+    //const ffmpeg = child_process.spawn('ffmpeg', [
+    //    '-y', 
+    //    '-f', 'image2pipe', 
+    //    '-vcodec', 'png', 
+    //    '-r', fps.toString(), 
+    //    '-i', '-',
+    //    // Use QTRLE (QuickTime Animation) which supports Alpha natively
+    //    '-c:v', 'qtrle', 
+    //    '-pix_fmt', 'argb',
+    //    options.output.replace('.webm', '.mov') // Change output to .mov
+    //]);
+
+
+    const extension = path.extname(options.output).toLowerCase();
+    
+    let ffmpegArgs = [];
+    
+    if (extension === '.mov') {
+        // MOV variant (QTRLE with Alpha)
+        ffmpegArgs = [
+            '-y', '-f', 'image2pipe', '-vcodec', 'png', '-r', fps.toString(), '-i', '-',
+            '-c:v', 'qtrle', 
+            '-pix_fmt', 'argb',
+            options.output
+        ];
+    } else {
+        // Default WebM variant (VP9 with Alpha)
+        ffmpegArgs = [
+            '-y', '-f', 'image2pipe', '-vcodec', 'png', '-r', fps.toString(), '-i', '-',
+            '-c:v', 'libvpx-vp9', 
+            '-pix_fmt', 'yuva420p', 
+            '-auto-alt-ref', '0', 
+            options.output
+        ];
+    }
+    
+    const ffmpeg = child_process.spawn('ffmpeg', ffmpegArgs);
+
 
     const promise = new Promise((resolve) => { ffmpeg.on('close', resolve); });
 
