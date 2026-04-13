@@ -84,45 +84,6 @@ const options = commander.program.opts();
     //    '-c:v', 'libvpx-vp9', '-pix_fmt', 'yuva420p', '-auto-alt-ref', '0', options.output
     //]);
 
-    //const ffmpeg = child_process.spawn('ffmpeg', [
-    //    '-y', 
-    //    '-f', 'image2pipe', 
-    //    '-vcodec', 'png', 
-    //    '-r', fps.toString(), 
-    //    '-i', '-',
-    //    '-c:v', 'libvpx-vp9', 
-    //    '-pix_fmt', 'yuva420p', // This is correct, but let's add the flag below
-    //    '-vf', 'format=yuva420p', // Force the filter chain to acknowledge alpha
-    //    '-auto-alt-ref', '0', 
-    //    options.output
-    //]);
-
-    //const ffmpeg = child_process.spawn('ffmpeg', [
-    //    '-y', 
-    //    '-f', 'image2pipe', 
-    //    '-vcodec', 'png', 
-    //    '-r', fps.toString(), 
-    //    '-i', '-',
-    //    // Explicitly define input as having alpha
-    //    '-filter_complex', 'format=yuva420p',
-    //    // Use the VP9 codec with Alpha support
-    //    '-c:v', 'libvpx-vp9', 
-    //    '-pix_fmt', 'yuva420p',
-    //    // Important: Force the background to be transparent
-    //    '-auto-alt-ref', '0', 
-    //    options.output
-    //]);
-
-    // Change the encoder string to this:
-    //const ffmpeg = child_process.spawn('ffmpeg', [
-    //    '-y', '-f', 'image2pipe', '-vcodec', 'png', '-r', fps.toString(), '-i', '-',
-    //    '-vf', 'format=yuva420p',
-    //    '-c:v', 'libvpx-vp9',
-    //    '-b:v', '2M', // Ensure a decent bitrate
-    //    '-auto-alt-ref', '0',
-    //    options.output
-    //]);
-
     const ffmpeg = child_process.spawn('ffmpeg', [
         '-y', 
         '-f', 'image2pipe', 
