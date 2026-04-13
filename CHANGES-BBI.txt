@@ -1,0 +1,1 @@
+The ".webm" format did not support alpha channels, whereas ".mov" allows them. The ffmpeg call was adjusted accordingly.
