@@ -73,7 +73,7 @@ const options = commander.program.opts();
 
     await page.evaluate(() => {
         document.documentElement.style.background = 'transparent';
-	document.body.style.background = 'transparent';
+        document.body.style.background = 'transparent';
     });
 
     await page.setViewport({ width : options.width, height : options.height });
