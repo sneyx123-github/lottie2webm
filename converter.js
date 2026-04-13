@@ -70,12 +70,69 @@ const options = commander.program.opts();
     `;
 
     await page.setContent(html);
+
+    await page.evaluate(() => {
+        document.documentElement.style.background = 'transparent';
+	document.body.style.background = 'transparent';
+    });
+
     await page.setViewport({ width : options.width, height : options.height });
     await page.waitForFunction(() => typeof (window.animation !== 'undefined'));
     
+    //const ffmpeg = child_process.spawn('ffmpeg', [
+    //    '-y', '-f', 'image2pipe', '-vcodec', 'png', '-r', fps.toString(), '-i', '-',
+    //    '-c:v', 'libvpx-vp9', '-pix_fmt', 'yuva420p', '-auto-alt-ref', '0', options.output
+    //]);
+
+    //const ffmpeg = child_process.spawn('ffmpeg', [
+    //    '-y', 
+    //    '-f', 'image2pipe', 
+    //    '-vcodec', 'png', 
+    //    '-r', fps.toString(), 
+    //    '-i', '-',
+    //    '-c:v', 'libvpx-vp9', 
+    //    '-pix_fmt', 'yuva420p', // This is correct, but let's add the flag below
+    //    '-vf', 'format=yuva420p', // Force the filter chain to acknowledge alpha
+    //    '-auto-alt-ref', '0', 
+    //    options.output
+    //]);
+
+    //const ffmpeg = child_process.spawn('ffmpeg', [
+    //    '-y', 
+    //    '-f', 'image2pipe', 
+    //    '-vcodec', 'png', 
+    //    '-r', fps.toString(), 
+    //    '-i', '-',
+    //    // Explicitly define input as having alpha
+    //    '-filter_complex', 'format=yuva420p',
+    //    // Use the VP9 codec with Alpha support
+    //    '-c:v', 'libvpx-vp9', 
+    //    '-pix_fmt', 'yuva420p',
+    //    // Important: Force the background to be transparent
+    //    '-auto-alt-ref', '0', 
+    //    options.output
+    //]);
+
+    // Change the encoder string to this:
+    //const ffmpeg = child_process.spawn('ffmpeg', [
+    //    '-y', '-f', 'image2pipe', '-vcodec', 'png', '-r', fps.toString(), '-i', '-',
+    //    '-vf', 'format=yuva420p',
+    //    '-c:v', 'libvpx-vp9',
+    //    '-b:v', '2M', // Ensure a decent bitrate
+    //    '-auto-alt-ref', '0',
+    //    options.output
+    //]);
+
     const ffmpeg = child_process.spawn('ffmpeg', [
-        '-y', '-f', 'image2pipe', '-vcodec', 'png', '-r', fps.toString(), '-i', '-',
-        '-c:v', 'libvpx-vp9', '-pix_fmt', 'yuva420p', '-auto-alt-ref', '0', options.output
+        '-y', 
+        '-f', 'image2pipe', 
+        '-vcodec', 'png', 
+        '-r', fps.toString(), 
+        '-i', '-',
+        // Use QTRLE (QuickTime Animation) which supports Alpha natively
+        '-c:v', 'qtrle', 
+        '-pix_fmt', 'argb',
+        options.output.replace('.webm', '.mov') // Change output to .mov
     ]);
 
     const promise = new Promise((resolve) => { ffmpeg.on('close', resolve); });
@@ -86,6 +143,7 @@ const options = commander.program.opts();
 
         await page.evaluate((frame) => { window.animation.goToAndStop(frame, true); }, i);
         const screenshot = await page.screenshot({ type : 'png', omitBackground : (options.background === 'transparent') });
+    	//const screenshot = await page.screenshot({ path: 'test_frame.png', type: 'png', omitBackground: true });
         ffmpeg.stdin.write(screenshot);
 
         progress.update(i)
