@@ -97,11 +97,11 @@ const options = commander.program.opts();
     //]);
 
 
-    const extension = path.extname(options.output).toLowerCase();
+    const suffix = path.extname(options.output).toLowerCase();
     
     let ffmpegArgs = [];
     
-    if (extension === '.mov') {
+    if (suffix === '.mov') {
         // MOV variant (QTRLE with Alpha)
         ffmpegArgs = [
             '-y', '-f', 'image2pipe', '-vcodec', 'png', '-r', fps.toString(), '-i', '-',
